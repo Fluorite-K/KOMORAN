@@ -17,16 +17,15 @@
  *******************************************************************************/
 package kr.co.shineware.nlp.komoran.modeler.model;
 
-import java.io.File;
-import java.io.InputStream;
+import kr.co.shineware.ds.trie.trie.doublearray.ahocorasick.AhoCorasickDoubleArrayTrie;
+import kr.co.shineware.nlp.komoran.interfaces.FileAccessible;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import kr.co.shineware.ds.aho_corasick.AhoCorasickDictionary;
-import kr.co.shineware.nlp.komoran.interfaces.FileAccessible;
-
 public class IrregularTrie implements FileAccessible{
-	private AhoCorasickDictionary<List<IrregularNode>> dic;
+	private AhoCorasickDoubleArrayTrie<List<IrregularNode>> dic;
 	
 	public IrregularTrie(){
 		this.init();
@@ -34,7 +33,7 @@ public class IrregularTrie implements FileAccessible{
 
 	public void init(){
 		this.dic = null;
-		this.dic = new AhoCorasickDictionary<>();
+		this.dic = new AhoCorasickDoubleArrayTrie<>();
 	}
 
 	public void put(String irr,IrregularNode irrNode){
@@ -57,25 +56,52 @@ public class IrregularTrie implements FileAccessible{
 		this.dic.put(irr, irrNodeList);
 	}
 	
-	public AhoCorasickDictionary<List<IrregularNode>> getTrieDictionary(){
+	public AhoCorasickDoubleArrayTrie<List<IrregularNode>> getTrieDictionary(){
 		return dic;
 	}
 
 	@Override
 	public void save(String filename) {
-		this.dic.save(filename);
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(filename)));
+			dic.save(oos);
+			oos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void load(String filename) {
-		this.dic.load(filename);		
+		try {
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(filename)));
+			dic.load(ois);
+			ois.close();
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void load(File file) {
-		this.dic.load(file);
+		ObjectInputStream ois = null;
+		try {
+			ois = new ObjectInputStream(new FileInputStream(file));
+			dic.load(ois);
+			ois.close();
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
 	}
 
-	public void load(InputStream inputStream) {
-		this.dic.load(inputStream);
+	public void load(InputStream is) {
+		ObjectInputStream ois = null;
+		try {
+			ois = new ObjectInputStream(is);
+			dic.load(ois);
+			ois.close();
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -11,19 +11,19 @@ public class Training {
     @Test
     @Ignore
     public void training() {
-        CorpusBuilder corpusBuilder = new CorpusBuilder();
-        corpusBuilder.setExclusiveIrrRule("resources/irrDic.remove.txt");
-        corpusBuilder.buildPath("tagged_corpus", "tag");
-        corpusBuilder.save("corpus_build");
+//        CorpusBuilder corpusBuilder = new CorpusBuilder();
+//        corpusBuilder.setExclusiveIrrRule("resources/irrDic.remove.txt");
+//        corpusBuilder.buildPath("tagged_corpus", "tag");
+//        corpusBuilder.save("corpus_build");
 
         ModelBuilder modelBuilder = new ModelBuilder();
-        modelBuilder.setExternalDic("user_data" + File.separator + "wiki.titles");
-        modelBuilder.buildPath("corpus_build");
-        modelBuilder.save("models_full");
+//        modelBuilder.setExternalDic("user_data" + File.separator + "wiki.titles");
+//        modelBuilder.buildPath("corpus_build");
+//        modelBuilder.save("models_full");
 
         modelBuilder = new ModelBuilder();
         modelBuilder.buildPath("corpus_build");
-        modelBuilder.save("models_light");
+        modelBuilder.save("models_light_dat");
 
     }
 }

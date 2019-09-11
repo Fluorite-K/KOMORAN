@@ -17,20 +17,19 @@
  *******************************************************************************/
 package kr.co.shineware.nlp.komoran.modeler.model;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import kr.co.shineware.ds.aho_corasick.AhoCorasickDictionary;
+import kr.co.shineware.ds.trie.trie.doublearray.ahocorasick.AhoCorasickDoubleArrayTrie;
 import kr.co.shineware.nlp.komoran.interfaces.FileAccessible;
 import kr.co.shineware.nlp.komoran.interfaces.UnitParser;
 import kr.co.shineware.nlp.komoran.model.ScoredTag;
 import kr.co.shineware.nlp.komoran.parser.KoreanUnitParser;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Observation implements FileAccessible{
 
-	private AhoCorasickDictionary<List<ScoredTag>> observation;
+	private AhoCorasickDoubleArrayTrie<List<ScoredTag>> observation;
 	private UnitParser parser;
 	
 	public Observation(){
@@ -38,12 +37,13 @@ public class Observation implements FileAccessible{
 	}
 	
 	private void init() {
-		this.observation = new AhoCorasickDictionary<>();
+		this.observation = new AhoCorasickDoubleArrayTrie<>();
 		this.parser = new KoreanUnitParser();
 	}
 
 	public void put(String word, String tag, int tagId, double observationScore) {
 		String koreanUnits = parser.parse(word);
+		this.observation
 		List<ScoredTag> scoredTagList = this.observation.getValue(koreanUnits);
 		if(scoredTagList == null){
 			scoredTagList = new ArrayList<>();
@@ -62,25 +62,52 @@ public class Observation implements FileAccessible{
 		this.observation.put(koreanUnits, scoredTagList);
 	}
 	
-	public AhoCorasickDictionary<List<ScoredTag>> getTrieDictionary(){
+	public AhoCorasickDoubleArrayTrie<List<ScoredTag>> getTrieDictionary(){
 		return observation;
 	}
 
 	@Override
 	public void save(String filename) {
-		observation.save(filename);
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(filename)));
+			observation.save(oos);
+			oos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void load(String filename) {
-		observation.load(filename);	
+		try {
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(filename)));
+			observation.load(ois);
+			ois.close();
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void load(File file) {
-		observation.load(file);
+		ObjectInputStream ois = null;
+		try {
+			ois = new ObjectInputStream(new FileInputStream(file));
+			observation.load(ois);
+			ois.close();
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public void load(InputStream is) {
-		observation.load(is);
+		ObjectInputStream ois = null;
+		try {
+			ois = new ObjectInputStream(is);
+			observation.load(ois);
+			ois.close();
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -1,6 +1,6 @@
 package kr.co.shineware.nlp.komoran.core.model;
 
-import kr.co.shineware.ds.aho_corasick.FindContext;
+import kr.co.shineware.ds.trie.trie.doublearray.ahocorasick.FindContext;
 import kr.co.shineware.nlp.komoran.constant.SYMBOL;
 import kr.co.shineware.nlp.komoran.model.MorphTag;
 import kr.co.shineware.nlp.komoran.model.ScoredTag;
@@ -24,27 +24,23 @@ public class Lattice {
     private Observation userDicObservation;
     private IrregularTrie irregularTrie;
 
-    private FindContext<List<ScoredTag>> observationFindContext;
-    private FindContext<List<IrregularNode>> irregularFindContext;
-    private FindContext<List<ScoredTag>> userDicFindContext;
+    private FindContext observationFindContext;
+    private FindContext irregularFindContext;
+    private FindContext userDicFindContext;
 
     private double prevMaxScore;
     private LatticeNode prevMaxNode;
     private int prevMaxIdx;
     private int nbest;
 
-    public Lattice(Resources resource, Observation userDic) {
-        this(resource, userDic, 1);
-    }
-
-    public Lattice(Resources resource, Observation userDic, int nbest) {
+    public Lattice(Resources resource, Observation userDic, int nbest, String sentence) {
         this.setPosTable(resource.getTable());
         this.setTransition(resource.getTransition());
         this.setObservation(resource.getObservation());
         this.setIrregularTrie(resource.getIrrTrie());
         this.setUserDicObservation(userDic);
         this.init();
-        this.makeNewContexts();
+        this.makeNewContexts(sentence);
         this.nbest = nbest;
     }
 
@@ -56,11 +52,11 @@ public class Lattice {
         this.irregularTrie = irrTrie;
     }
 
-    private void makeNewContexts() {
-        this.observationFindContext = this.observation.getTrieDictionary().newFindContext();
-        this.irregularFindContext = this.irregularTrie.getTrieDictionary().newFindContext();
+    private void makeNewContexts(String sentence) {
+        this.observationFindContext = new FindContext(sentence);
+        this.irregularFindContext = new FindContext(sentence);
         if (this.userDicObservation != null) {
-            this.userDicFindContext = this.userDicObservation.getTrieDictionary().newFindContext();
+            this.userDicFindContext = new FindContext(sentence);
         }
     }
 

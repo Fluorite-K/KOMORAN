@@ -33,6 +33,7 @@ import kr.co.shineware.nlp.komoran.model.ScoredTag;
 import kr.co.shineware.nlp.komoran.modeler.model.IrregularNode;
 import kr.co.shineware.nlp.komoran.modeler.model.Observation;
 import kr.co.shineware.nlp.komoran.parser.KoreanUnitParser;
+import kr.co.shineware.nlp.komoran.util.ElapsedTimeChecker;
 import kr.co.shineware.nlp.komoran.util.KomoranCallable;
 import kr.co.shineware.util.common.file.FileUtil;
 import kr.co.shineware.util.common.model.Pair;
@@ -193,7 +194,7 @@ public class Komoran implements Cloneable {
 
         sentence = sentence.replaceAll("[ ]+", " ").trim();
 
-        Lattice lattice = new Lattice(this.resources, this.userDic, nbest);
+        Lattice lattice = new Lattice(this.resources, this.userDic, nbest, sentence);
 
         //연속된 숫자, 외래어, 기호 등을 파싱 하기 위한 버퍼
         ContinuousSymbolBuffer continuousSymbolBuffer = new ContinuousSymbolBuffer();
@@ -224,6 +225,8 @@ public class Komoran implements Cloneable {
                 whitespaceIndex = curJasoIndex + 1;
             }
 
+
+
             //이 부분도 조금 더 깔끔한 방법으로 처리 할 수 없을지 고민해보자
             this.continuousSymbolParsing(lattice, jasoUnits.charAt(curJasoIndex), curJasoIndex, continuousSymbolBuffer); //숫자, 영어, 외래어 파싱
 
@@ -232,9 +235,15 @@ public class Komoran implements Cloneable {
 
             this.userDicParsing(lattice, jasoUnits.charAt(curJasoIndex), curJasoIndex); //사용자 사전 적용
 
+            ElapsedTimeChecker.checkBeginTime("rp");
             this.regularParsing(lattice, jasoUnits.charAt(curJasoIndex), curJasoIndex); //일반규칙 파싱
+            ElapsedTimeChecker.checkEndTime("rp");
+            ElapsedTimeChecker.checkBeginTime("irr");
             this.irregularParsing(lattice, jasoUnits.charAt(curJasoIndex), curJasoIndex); //불규칙 파싱
+            ElapsedTimeChecker.checkEndTime("irr");
+            ElapsedTimeChecker.checkBeginTime("irrext");
             this.irregularExtends(lattice, jasoUnits.charAt(curJasoIndex), curJasoIndex); //불규칙 확장
+            ElapsedTimeChecker.checkEndTime("irrext");
         }
 
         this.consumeContiniousSymbolParserBuffer(lattice, jasoUnits, continuousSymbolBuffer);
@@ -497,22 +506,25 @@ public class Komoran implements Cloneable {
                 if (prevLatticeNode.getMorphTag().getTagId() == SYMBOL.IRREGULAR_ID) {
                     //마지막 형태소 정보를 얻어옴
                     String lastMorph = prevLatticeNode.getMorphTag().getMorph();
+// TODO: 2019-09-12 아래 주석을 살려야 한다..기존 아호 코라식을 쓰는 한이 있더라도...
 
                     //불규칙의 마지막 형태소에 현재 자소 단위를 합쳤을 때 자식 노드가 있다면 계속 탐색 가능 후보로 처리 해야함
-                    if (this.resources.getObservation().getTrieDictionary().hasChild((lastMorph + jaso).toCharArray())) {
-                        LatticeNode extendedIrregularNode = new LatticeNode();
-                        extendedIrregularNode.setBeginIdx(prevLatticeNode.getBeginIdx());
-                        extendedIrregularNode.setEndIdx(curIndex + 1);
-                        extendedIrregularNode.setMorphTag(new MorphTag(prevLatticeNode.getMorphTag().getMorph() + jaso, SYMBOL.IRREGULAR, SYMBOL.IRREGULAR_ID));
-                        extendedIrregularNode.setPrevNodeIdx(prevLatticeNode.getPrevNodeIdx());
-                        extendedIrregularNode.setScore(prevLatticeNode.getScore());
-                        extendedIrrNodeList.add(extendedIrregularNode);
-                    }
+//                    if (this.resources.getObservation().getTrieDictionary().hasChild((lastMorph + jaso).toCharArray())) {
+//                        LatticeNode extendedIrregularNode = new LatticeNode();
+//                        extendedIrregularNode.setBeginIdx(prevLatticeNode.getBeginIdx());
+//                        extendedIrregularNode.setEndIdx(curIndex + 1);
+//                        extendedIrregularNode.setMorphTag(new MorphTag(prevLatticeNode.getMorphTag().getMorph() + jaso, SYMBOL.IRREGULAR, SYMBOL.IRREGULAR_ID));
+//                        extendedIrregularNode.setPrevNodeIdx(prevLatticeNode.getPrevNodeIdx());
+//                        extendedIrregularNode.setScore(prevLatticeNode.getScore());
+//                        extendedIrrNodeList.add(extendedIrregularNode);
+//                    }
+
                     //불규칙의 마지막 형태소에 현재 자소 단위를 합쳐 점수를 얻어옴
                     List<ScoredTag> lastScoredTags = this.resources.getObservation().getTrieDictionary().getValue(lastMorph + jaso);
                     if (lastScoredTags == null) {
                         continue;
                     }
+
 
                     //얻어온 점수를 토대로 lattice에 넣음
                     for (ScoredTag scoredTag : lastScoredTags) {
@@ -524,7 +536,6 @@ public class Komoran implements Cloneable {
             for (LatticeNode extendedIrrNode : extendedIrrNodeList) {
                 lattice.appendNode(extendedIrrNode);
             }
-
         }
     }
 
@@ -662,8 +673,6 @@ public class Komoran implements Cloneable {
             }
             br.close();
 
-            //init
-            this.userDic.getTrieDictionary().buildFailLink();
 
         } catch (Exception e) {
             e.printStackTrace();

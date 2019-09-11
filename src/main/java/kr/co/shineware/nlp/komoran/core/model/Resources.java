@@ -75,9 +75,6 @@ public class Resources {
 		this.observation.load(path+File.separator+FILENAME.OBSERVATION);
 		this.transition.load(path+File.separator+FILENAME.TRANSITION);
 		this.irrTrie.load(path+File.separator+FILENAME.IRREGULAR_MODEL);
-		
-		this.observation.getTrieDictionary().buildFailLink();
-		this.irrTrie.getTrieDictionary().buildFailLink();
 	}
 
 	public void loadPosTable(File file){
@@ -89,12 +86,10 @@ public class Resources {
 
 	public void loadObservation(File file){
 		this.observation.load(file);
-		this.observation.getTrieDictionary().buildFailLink();
 	}
 
 	public void loadObservation(InputStream inputStream){
 		this.observation.load(inputStream);
-		this.observation.getTrieDictionary().buildFailLink();
 	}
 
 	public void loadTransition(File file){
@@ -107,11 +102,9 @@ public class Resources {
 
 	public void loadIrregular(File file){
 		this.irrTrie.load(file);
-		this.irrTrie.getTrieDictionary().buildFailLink();
 	}
 
 	public void loadIrregular(InputStream inputStream){
 		this.irrTrie.load(inputStream);
-		this.irrTrie.getTrieDictionary().buildFailLink();
 	}
 }
