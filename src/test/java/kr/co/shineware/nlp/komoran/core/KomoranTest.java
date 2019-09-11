@@ -22,7 +22,8 @@ public class KomoranTest {
 
     @Before
     public void init() {
-        this.komoran = new Komoran(DEFAULT_MODEL.LIGHT);
+//        this.komoran = new Komoran(DEFAULT_MODEL.LIGHT);
+        this.komoran = new Komoran("models_light_dat");
     }
 
     @Test
@@ -105,8 +106,6 @@ public class KomoranTest {
         }
 
         System.out.println("Avg. elapsed time : " + (avgElapsedTime / 10.0));
-
-        ElapsedTimeChecker.printTimes();
     }
 
     @Test

@@ -113,6 +113,7 @@ public class ModelBuilder {
 				this.irrTrie.put(irr, irrNode);				
 			}
 		}
+		this.irrTrie.getTrieDictionary().build();
 	}
 
 	/**
@@ -217,6 +218,7 @@ public class ModelBuilder {
 				this.observation.put(word,posTf.getKey(),this.table.getId(posTf.getKey()),observationScore);
 			}
 		}
+		this.observation.getTrieDictionary().build();
 	}
 
 	/**

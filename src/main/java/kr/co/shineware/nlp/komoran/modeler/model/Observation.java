@@ -17,6 +17,7 @@
  *******************************************************************************/
 package kr.co.shineware.nlp.komoran.modeler.model;
 
+import kr.co.shineware.ds.aho_corasick.AhoCorasickDictionary;
 import kr.co.shineware.ds.trie.trie.doublearray.ahocorasick.AhoCorasickDoubleArrayTrie;
 import kr.co.shineware.nlp.komoran.interfaces.FileAccessible;
 import kr.co.shineware.nlp.komoran.interfaces.UnitParser;
@@ -30,6 +31,7 @@ import java.util.List;
 public class Observation implements FileAccessible{
 
 	private AhoCorasickDoubleArrayTrie<List<ScoredTag>> observation;
+	private AhoCorasickDictionary<List<ScoredTag>> tempObservation;
 	private UnitParser parser;
 	
 	public Observation(){
@@ -38,13 +40,13 @@ public class Observation implements FileAccessible{
 	
 	private void init() {
 		this.observation = new AhoCorasickDoubleArrayTrie<>();
+		this.tempObservation = new AhoCorasickDictionary<>();
 		this.parser = new KoreanUnitParser();
 	}
 
 	public void put(String word, String tag, int tagId, double observationScore) {
 		String koreanUnits = parser.parse(word);
-		this.observation
-		List<ScoredTag> scoredTagList = this.observation.getValue(koreanUnits);
+		List<ScoredTag> scoredTagList = this.tempObservation.getValue(koreanUnits);
 		if(scoredTagList == null){
 			scoredTagList = new ArrayList<>();
 			scoredTagList.add(new ScoredTag(tag, tagId, observationScore));
@@ -60,6 +62,7 @@ public class Observation implements FileAccessible{
 			}
 		}
 		this.observation.put(koreanUnits, scoredTagList);
+		this.tempObservation.put(koreanUnits, scoredTagList);
 	}
 	
 	public AhoCorasickDoubleArrayTrie<List<ScoredTag>> getTrieDictionary(){

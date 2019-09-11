@@ -194,14 +194,14 @@ public class Komoran implements Cloneable {
 
         sentence = sentence.replaceAll("[ ]+", " ").trim();
 
-        Lattice lattice = new Lattice(this.resources, this.userDic, nbest, sentence);
-
         //연속된 숫자, 외래어, 기호 등을 파싱 하기 위한 버퍼
         ContinuousSymbolBuffer continuousSymbolBuffer = new ContinuousSymbolBuffer();
 
         //자소 단위로 분할
         String jasoUnits = unitParser.parse(sentence);
         List<Pair<Character, KoreanUnitParser.UnitType>> jasoUnitsWithType = unitParser.parseWithType(sentence);
+
+        Lattice lattice = new Lattice(this.resources, this.userDic, nbest, jasoUnits);
 
         int length = jasoUnits.length();
         //start 노드 또는 end 노드의 바로 다음 인덱스
@@ -235,15 +235,9 @@ public class Komoran implements Cloneable {
 
             this.userDicParsing(lattice, jasoUnits.charAt(curJasoIndex), curJasoIndex); //사용자 사전 적용
 
-            ElapsedTimeChecker.checkBeginTime("rp");
             this.regularParsing(lattice, jasoUnits.charAt(curJasoIndex), curJasoIndex); //일반규칙 파싱
-            ElapsedTimeChecker.checkEndTime("rp");
-            ElapsedTimeChecker.checkBeginTime("irr");
             this.irregularParsing(lattice, jasoUnits.charAt(curJasoIndex), curJasoIndex); //불규칙 파싱
-            ElapsedTimeChecker.checkEndTime("irr");
-            ElapsedTimeChecker.checkBeginTime("irrext");
             this.irregularExtends(lattice, jasoUnits.charAt(curJasoIndex), curJasoIndex); //불규칙 확장
-            ElapsedTimeChecker.checkEndTime("irrext");
         }
 
         this.consumeContiniousSymbolParserBuffer(lattice, jasoUnits, continuousSymbolBuffer);
@@ -669,9 +663,9 @@ public class Komoran implements Cloneable {
                     pos = line.substring(lastIdx + 1);
                 }
                 this.userDic.put(morph, pos, this.resources.getTable().getId(pos), 0.0);
-
             }
             br.close();
+            this.userDic.getTrieDictionary().build();
 
 
         } catch (Exception e) {

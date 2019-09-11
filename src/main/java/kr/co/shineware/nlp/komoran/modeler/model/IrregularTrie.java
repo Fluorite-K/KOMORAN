@@ -17,6 +17,7 @@
  *******************************************************************************/
 package kr.co.shineware.nlp.komoran.modeler.model;
 
+import kr.co.shineware.ds.aho_corasick.AhoCorasickDictionary;
 import kr.co.shineware.ds.trie.trie.doublearray.ahocorasick.AhoCorasickDoubleArrayTrie;
 import kr.co.shineware.nlp.komoran.interfaces.FileAccessible;
 
@@ -26,6 +27,7 @@ import java.util.List;
 
 public class IrregularTrie implements FileAccessible{
 	private AhoCorasickDoubleArrayTrie<List<IrregularNode>> dic;
+	private AhoCorasickDictionary<List<IrregularNode>> tempDic;
 	
 	public IrregularTrie(){
 		this.init();
@@ -34,10 +36,11 @@ public class IrregularTrie implements FileAccessible{
 	public void init(){
 		this.dic = null;
 		this.dic = new AhoCorasickDoubleArrayTrie<>();
+		tempDic = new AhoCorasickDictionary<>();
 	}
 
 	public void put(String irr,IrregularNode irrNode){
-		List<IrregularNode> irrNodeList = this.dic.getValue(irr);
+		List<IrregularNode> irrNodeList = this.tempDic.getValue(irr);
 		if(irrNodeList == null){
 			irrNodeList = new ArrayList<>();
 			irrNodeList.add(irrNode);
@@ -54,6 +57,7 @@ public class IrregularTrie implements FileAccessible{
 			}
 		}
 		this.dic.put(irr, irrNodeList);
+		tempDic.put(irr, irrNodeList);
 	}
 	
 	public AhoCorasickDoubleArrayTrie<List<IrregularNode>> getTrieDictionary(){
