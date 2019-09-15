@@ -335,7 +335,7 @@ public class Lattice {
 			}
 
 			//자소 결합규칙 체크
-			if(tagId == this.posTable.getId(SYMBOL.JKO)){
+			if(morph != null && tagId == this.posTable.getId(SYMBOL.JKO)){
 				if(this.hasJongsung(prevMorph)){
 					if(morph.charAt(0) != 'ㅇ'){
 						continue;
@@ -345,7 +345,7 @@ public class Lattice {
 						continue;
 					}
 				}
-			}else if(tagId == this.posTable.getId(SYMBOL.JKS)
+			}else if(morph != null && tagId == this.posTable.getId(SYMBOL.JKS)
 					|| tagId == this.posTable.getId(SYMBOL.JKC)){
 				if(this.hasJongsung(prevMorph)){
 					if(morph.charAt(0) == 'ㄱ' && morph.charAt(1) == 'ㅏ'){

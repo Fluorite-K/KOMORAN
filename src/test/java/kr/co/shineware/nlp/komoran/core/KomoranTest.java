@@ -19,10 +19,15 @@ package kr.co.shineware.nlp.komoran.core;
 
 import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import kr.co.shineware.nlp.komoran.model.Token;
+import kr.co.shineware.util.common.file.FileUtil;
 import kr.co.shineware.util.common.model.Pair;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class KomoranTest {
@@ -30,8 +35,48 @@ public class KomoranTest {
 	private Komoran komoran;
 	@Before
 	public void init() throws Exception {
-		this.komoran = new Komoran("models_full");
+		this.komoran = new Komoran("models_light");
 	}
+
+	@Test
+	public void singleThreadSpeedTest() throws IOException {
+		BufferedWriter bw = new BufferedWriter(new FileWriter("analyze_result.txt"));
+
+		List<String> lines = FileUtil.load2List("user_data/wiki.titles");
+		List<KomoranResult> komoranList = new ArrayList<>();
+
+		long begin = System.currentTimeMillis();
+
+		int count = 0;
+
+		for (String line : lines) {
+
+			komoranList.add(this.komoran.analyze(line));
+			if (komoranList.size() == 1000) {
+				for (KomoranResult komoranResult : komoranList) {
+					bw.write(komoranResult.getPlainText());
+					bw.newLine();
+				}
+				komoranList.clear();
+			}
+			count++;
+			if (count % 10000 == 0) {
+				System.out.println(count);
+			}
+		}
+
+		for (KomoranResult komoranResult : komoranList) {
+			bw.write(komoranResult.getPlainText());
+			bw.newLine();
+		}
+
+		long end = System.currentTimeMillis();
+
+		bw.close();
+
+		System.out.println("Elapsed time : " + (end - begin));
+	}
+
 	@Test
 	public void analyze() throws Exception {
 		KomoranResult komoranResult = this.komoran.analyze("자주 걸렸던 병이다");
