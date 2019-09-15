@@ -19,6 +19,7 @@ package kr.co.shineware.nlp.komoran.core;
 
 import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import kr.co.shineware.nlp.komoran.model.Token;
+import kr.co.shineware.nlp.komoran.util.ElapsedTimeChecker;
 import kr.co.shineware.util.common.file.FileUtil;
 import kr.co.shineware.util.common.model.Pair;
 import org.junit.Before;
@@ -75,6 +76,7 @@ public class KomoranTest {
 		bw.close();
 
 		System.out.println("Elapsed time : " + (end - begin));
+		ElapsedTimeChecker.printTimes();
 	}
 
 	@Test

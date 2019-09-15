@@ -31,6 +31,7 @@ import kr.co.shineware.nlp.komoran.model.Tag;
 import kr.co.shineware.nlp.komoran.modeler.model.IrregularNode;
 import kr.co.shineware.nlp.komoran.modeler.model.Observation;
 import kr.co.shineware.nlp.komoran.parser.KoreanUnitParser;
+import kr.co.shineware.nlp.komoran.util.ElapsedTimeChecker;
 import kr.co.shineware.util.common.model.Pair;
 import kr.co.shineware.util.common.string.StringUtil;
 
@@ -78,6 +79,7 @@ public class Komoran implements Cloneable{
 		int prevStartIdx = 0;
 		boolean inserted;
 
+		ElapsedTimeChecker.checkBeginTime("CORE");
 		for(int i=0; i<length; i++){
 			//기분석 사전
 			int skipIdx = this.lookupFwd(jasoUnits,i);
@@ -102,6 +104,8 @@ public class Komoran implements Cloneable{
 			this.irregularExtends(jasoUnits.charAt(i),i); //불규칙 확장
 
 		}
+
+		ElapsedTimeChecker.checkEndTime("CORE");
 
 		this.consumeContiniousSymbolParserBuffer(jasoUnits);
 		this.lattice.setLastIdx(jasoUnits.length());
