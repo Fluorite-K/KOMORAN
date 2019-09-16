@@ -549,7 +549,7 @@ public class Komoran implements Cloneable {
 
             List<IrregularNode> irrNodes = morphIrrNodesMap.get(morph);
             for (IrregularNode irregularNode : irrNodes) {
-                lattice.put(beginIdx, endIdx, irregularNode);
+//                lattice.put(beginIdx, endIdx, irregularNode);
                 this.insertLattice(lattice, beginIdx, endIdx, irregularNode);
             }
         }
