@@ -504,15 +504,15 @@ public class Komoran implements Cloneable {
 // TODO: 2019-09-12 아래 주석을 살려야 한다..기존 아호 코라식을 쓰는 한이 있더라도...
 
                     //불규칙의 마지막 형태소에 현재 자소 단위를 합쳤을 때 자식 노드가 있다면 계속 탐색 가능 후보로 처리 해야함
-//                    if (this.resources.getObservation().getTrieDictionary().hasChild((lastMorph + jaso).toCharArray())) {
-//                        LatticeNode extendedIrregularNode = new LatticeNode();
-//                        extendedIrregularNode.setBeginIdx(prevLatticeNode.getBeginIdx());
-//                        extendedIrregularNode.setEndIdx(curIndex + 1);
-//                        extendedIrregularNode.setMorphTag(new MorphTag(prevLatticeNode.getMorphTag().getMorph() + jaso, SYMBOL.IRREGULAR, SYMBOL.IRREGULAR_ID));
-//                        extendedIrregularNode.setPrevNodeIdx(prevLatticeNode.getPrevNodeIdx());
-//                        extendedIrregularNode.setScore(prevLatticeNode.getScore());
-//                        extendedIrrNodeList.add(extendedIrregularNode);
-//                    }
+                    if (this.resources.getObservation().getTrieDictionary().hasChild((lastMorph + jaso).toCharArray())) {
+                        LatticeNode extendedIrregularNode = new LatticeNode();
+                        extendedIrregularNode.setBeginIdx(prevLatticeNode.getBeginIdx());
+                        extendedIrregularNode.setEndIdx(curIndex + 1);
+                        extendedIrregularNode.setMorphTag(new MorphTag(prevLatticeNode.getMorphTag().getMorph() + jaso, SYMBOL.IRREGULAR, SYMBOL.IRREGULAR_ID));
+                        extendedIrregularNode.setPrevNodeIdx(prevLatticeNode.getPrevNodeIdx());
+                        extendedIrregularNode.setScore(prevLatticeNode.getScore());
+                        extendedIrrNodeList.add(extendedIrregularNode);
+                    }
 
                     //불규칙의 마지막 형태소에 현재 자소 단위를 합쳐 점수를 얻어옴
                     List<ScoredTag> lastScoredTags = this.resources.getObservation().getTrieDictionary().getValue(lastMorph + jaso);
